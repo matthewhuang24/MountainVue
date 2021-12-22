@@ -6,7 +6,7 @@
         class="upload-file"
         ref="inputFile"
         type="file"
-        accept="application/JSON"
+        accept=".vue"
         @change="handleUpload"
         value=""
       />
@@ -28,6 +28,8 @@
 <script>
 import logo from '../img/logo.png';
 import MVTree from './MVTree.vue';
+import MVParser from '../../MVParser'
+// const fs = require('fs');
 
 export default {
   name: 'App',
@@ -54,9 +56,41 @@ export default {
     // Convert uploaded component to string
     async handleUpload() {
       const file = this.$refs.inputFile.files[0];
-
       const response = await file.text();
-      const data = await JSON.parse(response);
+
+      console.log('file', file)
+      console.log('response', response)
+
+      // RegEx for Template Tags
+      const templateRegex = new RegExp("(?:<template>)(.*)(?:</template>)", "s");
+      const templateData = response.match(templateRegex)
+
+       // has the usable AST structure to work with
+      console.log( 'AST TREE:', MVParser(templateData[0]).children)
+
+      console.log('this:', this)
+      console.log('File Path', file.path)
+      // console.log('FS', fs.readdir(file.path))
+
+      // -------------------
+
+      // RegEx for Script Tags
+      const scriptRegex = new RegExp("(?:<script>)(.*)(?:<\/script>)", "s");
+      const scriptData = response.match(scriptRegex);
+
+      console.log("scriptData", scriptData);
+      console.log("scriptDataZero", scriptData[0]);
+
+      // find the path and recursively go through it
+
+     
+      
+      // const data = await JSON.parse(response);
+
+
+     
+
+
 
       this.tree = data;
       this.setDisplay = 'block';
@@ -121,4 +155,5 @@ body {
   font-size: 11px;
   width: 46%;
 }
+
 </style>
